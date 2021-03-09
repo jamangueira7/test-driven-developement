@@ -17,10 +17,12 @@ class TodoRepository {
 
 module.exports = TodoRepository;
 
+/*
 const c = new TodoRepository();
 
 c.create({ name: 'XuxaDaSilva', age:90 });
 c.create({ name: 'Joaozinho', age:90 });
 
 console.log('list', c.list());
+*/
 
