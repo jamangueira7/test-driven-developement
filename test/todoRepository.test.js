@@ -17,7 +17,20 @@ describe('todoRepositoriy', () => {
 
     describe('methods signature', () => {
         it('should call insertOne from lokijs', () => {
+            const functioName = "insertOne";
+            const expectedReturn = true;
 
+            sandbox.stub(
+                todoRepositoriy.schedule,
+                functioName
+            ).returns(expectedReturn);
+
+            const data = { name: 'Erick' }
+
+            const result = todoRepositoriy.create(data);
+
+            expect(result).to.be.deep.equal(expectedReturn);
+            expect(todoRepositoriy.schedule[functioName].calledOnceWithExactly(data)).to.be.ok;
         });
         it('should call find from lokijs', () => {
             const mockDatabase = [
