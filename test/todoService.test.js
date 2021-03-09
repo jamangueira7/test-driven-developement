@@ -1,4 +1,4 @@
-const { describe, it, before } = require('mocha');
+const { describe, it, before, afterEach, beforeEach } = require('mocha');
 const { expect } = require('chai');
 const { createSandbox } = require('sinon');
 const TodoService = require('../src/todoService');
@@ -51,13 +51,13 @@ describe('todoService', () => {
         let todoService;
 
         beforeEach(() => {
-            const dependecies = {
+            const dependencies  = {
                 todoRepository: {
-                    list: sandbox.stub().returns(true)
+                    create: sandbox.stub().returns(true)
                 }
             };
 
-            todoService = new TodoService(dependecies);
+            todoService = new TodoService(dependencies);
         });
 
         it('shouldn\'t save todo item with invalid data', () => {
@@ -86,16 +86,52 @@ describe('todoService', () => {
                 when: new Date("2020-12-01 12:00:00 GMT-0")
             };
 
-            const data = new Todo(data);
+            const expectedID = '000001';
 
-            expect(result).to.be.deep.equal([expected]);
+            const uuid = require('uuid');
+            const fakeUUID = sandbox.fake.returns(expectedID);
+            sandbox.replace(uuid, "v4", fakeUUID);
+
+            const data = new Todo(properties);
+
+            const today = new Date("2020-12-02");
+            sandbox.useFakeTimers(today.getTime());
+
+            todoService.create(data);
+
+            const expectedCallWith = {
+                ...data,
+                status: "late"
+            };
+
+            expect(todoService.todoRepository.create.calledOnceWithExactly(expectedCallWith)).to.be.ok;
         });
 
         it('should save todo item with pending status', () => {
-            const result = todoService.list();
-            const [{ meta, $loki, ...expected }] = mockDatabase;
+            const properties = {
+                text: 'I must walk my dog',
+                when: new Date("2020-12-10 12:00:00 GMT-0")
+            };
 
-            expect(result).to.be.deep.equal([expected]);
+            const expectedID = '000001';
+
+            const uuid = require('uuid');
+            const fakeUUID = sandbox.fake.returns(expectedID);
+            sandbox.replace(uuid, "v4", fakeUUID);
+
+            const data = new Todo(properties);
+
+            const today = new Date("2020-12-02");
+            sandbox.useFakeTimers(today.getTime());
+
+            todoService.create(data);
+
+            const expectedCallWith = {
+                ...data,
+                status: "pending"
+            };
+
+            expect(todoService.todoRepository.create.calledOnceWithExactly(expectedCallWith)).to.be.ok;
         });
     });
 });

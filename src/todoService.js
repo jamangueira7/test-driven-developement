@@ -14,10 +14,20 @@ class TodoService {
                 }
             }
         }
+
+        const { when } = todoItem;
+        const today = new Date();
+
+        const todo = {
+            ...todoItem,
+            status: when > today ? 'pending' : 'late',
+        };
+
+        return this.todoRepository.create(todo);
     }
 
     list(query) {
-        return this.todoRepository.list()
+        return this.todoRepository.list(query)
             .map(({ meta, $loki, ...result }) => result);
     }
 }
